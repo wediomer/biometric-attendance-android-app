@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.biometricattendance.db.DatabaseHelper
 
-
 class SignInActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +25,17 @@ class SignInActivity : AppCompatActivity() {
             val password = passwordField.text.toString()
 
             if (db.validateUser(email, password)) {
-                Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, HomeActivity::class.java))
-                finish()
+                val userId = db.getUserIdByEmail(email) // Retrieve userId based on email
+                if (userId != -1) { // Ensure valid userId is retrieved
+                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, HomeActivity::class.java).apply {
+                        putExtra("USER_ID", userId) // Pass userId to HomeActivity
+                    }
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "User ID not found. Please contact support.", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(this, "Invalid email or password.", Toast.LENGTH_SHORT).show()
             }
